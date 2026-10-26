@@ -130,12 +130,13 @@ input.it.field[type=checkbox],input.it.field[type=radio]{margin:0;accent-color:#
 <body class="t-text">
 <div id="homeView" class="view"></div>
 <div id="toolView" class="view hidden"></div>
+<div id="filesView" class="view hidden"></div>
 <div id="editorView" class="view hidden">
 <header id="bar">
   <button class="btn" id="backBtn" title="All tools"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
   <div class="brand"><div class="logo">ލ</div><div>Liyun</div></div>
 
-  <button class="btn" id="openBtn" title="Open a PDF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span class="lbl">Open PDF</span></button>
+  <button class="btn" id="openBtn" title="Open a PDF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span class="lbl opt">Open PDF</span></button>
 
   <div class="grp" id="tools">
     <button class="btn" data-tool="select" title="Select / move (V)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 3l14 8-6 2-3 6z"/></svg><span class="lbl opt">Select</span></button>
@@ -171,7 +172,8 @@ input.it.field[type=checkbox],input.it.field[type=radio]{margin:0;accent-color:#
   </div>
 
   <div class="sep"></div>
-  <button class="btn primary" id="saveBtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Download PDF</button>
+  <button class="btn ghost" id="libSaveBtn" disabled title="Save to My Files (Ctrl+S)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h11l5 5v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M7 3v5h8M7 21v-7h10v7"/></svg><span class="lbl">Save</span></button>
+  <button class="btn primary" id="saveBtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg><span class="lbl">Download</span></button>
 </header>
 
 <main id="main">
@@ -180,6 +182,7 @@ input.it.field[type=checkbox],input.it.field[type=radio]{margin:0;accent-color:#
     <div class="dvh">ޕީޑީއެފް ފޯމުތައް ދިވެހިން ފުރުމަށް</div>
     <p>Open a PDF, click where you want to write, and type. Everything stays in your browser.</p>
     <button class="btn primary" id="openBtn2" style="font-size:15px;padding:10px 18px">Choose a PDF…</button>
+    <button class="btn ghost" id="openLib" style="font-size:15px;padding:10px 18px;margin-left:6px">From My Files</button>
     <div style="color:var(--muted);font-size:12px;margin-top:8px">or drop a file here</div>
     <div class="steps">
       <div><b>1 · Type</b>Pick <b style="display:inline">Text</b>, click on a dotted line and type. Your normal keys produce Thaana (phonetic layout: h=ހ, a=ަ …).</div>
@@ -351,6 +354,7 @@ async function openFile(file, force){
     const buf=new Uint8Array(await file.arrayBuffer());
     S.file=buf.slice(0); S.name=file.name||"document.pdf";
     const pdf=await pdfjsLib.getDocument({data:buf, isEvalSupported:false}).promise;
+    S.libId=null; S.libFolder=null;
     S.pdf=pdf; S.dirty=false; S.items=[]; S.history=[]; S.sel=null; S.pages=[];
     pagesEl.innerHTML=""; emptyEl.classList.add("hidden");
     for(let i=1;i<=pdf.numPages;i++){
@@ -361,7 +365,7 @@ async function openFile(file, force){
     S.scale=fitScale();
     buildPages();
     for (const P of S.pages) await addFormFields(P);
-    $("saveBtn").disabled=false;
+    $("saveBtn").disabled=false; $("libSaveBtn").disabled=false;
     document.title = S.name+" — Liyun";
     updateHint();
     const nf=S.items.filter(i=>i.type==="field").length;
@@ -708,6 +712,7 @@ document.addEventListener("keydown",e=>{
   const typing=isTypingTarget(document.activeElement);
   if((e.ctrlKey||e.metaKey) && e.code==="Space"){ e.preventDefault(); setDv(!S.dv); toast(S.dv?"Dhivehi typing":"English typing",1200); return; }
   if((e.ctrlKey||e.metaKey) && !e.shiftKey && e.key.toLowerCase()==="z" && !typing && curView==="editor"){ e.preventDefault(); undo(); return; }
+  if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==="s" && curView==="editor" && S.pdf){ e.preventDefault(); editorSave(); return; }
   if(e.key==="Escape"){ if(typing) document.activeElement.blur(); select(null); return; }
   if(typing) return;
   if((e.key==="Delete"||e.key==="Backspace") && selItem()){ e.preventDefault(); pushHist(); removeItem(selItem()); return; }

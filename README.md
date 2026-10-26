@@ -4,6 +4,7 @@ A PDF toolbox that works in Dhivehi. Everything runs in the browser, and files a
 
 - **Edit & fill PDF**: type Thaana (phonetic keyboard) or English anywhere on the page. Also: ✓/✗ marks, whiteout, a pen, images, and filling real form fields.
 - **Sign PDF**: draw a signature or upload a photo of one (the white background is removed automatically).
+- **My Files**: save PDFs (forms stay editable), create folders, rename, move, duplicate, search. Files are kept in this browser's storage on this device.
 - **Merge, Split, Organize, Rotate, Page numbers (ސަފުހާ 1), Watermark, JPG → PDF, PDF → JPG**
 
 ## Deploy

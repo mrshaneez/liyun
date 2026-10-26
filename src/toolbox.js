@@ -32,7 +32,7 @@ const BRAND='<div class="brand"><div class="logo">ލ</div><div>Liyun <small>ލި
 
 function showView(v){
   curView=v;
-  ["home","tool","editor"].forEach(n=>$(n+"View").classList.toggle("hidden",n!==v));
+  ["home","tool","editor","files"].forEach(n=>$(n+"View").classList.toggle("hidden",n!==v));
   $("hint").classList.toggle("hidden", v!=="editor" || !S.pdf);
   if(v!=="editor") setOsk(false);
   window.scrollTo(0,0);
@@ -41,7 +41,7 @@ function showView(v){
 /* ---------------- home ---------------- */
 function renderHome(){
   const h=$("homeView");
-  h.innerHTML=`<nav class="topnav">${BRAND}<div class="sp"></div><span class="note">Files never leave your device</span></nav>
+  h.innerHTML=`<nav class="topnav">${BRAND}<div class="sp"></div><span class="note hide-sm">Files never leave your device</span><button class="btn ghost" id="myFilesBtn">${FICON.folder.replace("<svg ","<svg width=\"20\" height=\"20\" ")} My Files</button></nav>
   <section class="hero"><h1>Every PDF tool you need — in Dhivehi too</h1>
   <div class="dvh">ޕީޑީއެފް އާ ގުޅޭ ހުރިހާ ކަމެއް، ދިވެހިބަހުން</div>
   <p>Fill forms in Thaana, sign, merge, split, number and watermark PDFs. Everything runs right here in your browser.</p></section>
@@ -52,6 +52,7 @@ function renderHome(){
   <div class="privacy">No uploads, no account. Your PDFs are processed on this device only.</div>`;
   h.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>openTool(b.dataset.t));
   const c=$("contBtn"); if(c) c.onclick=()=>showView("editor");
+  $("myFilesBtn").onclick=()=>openFiles();
 }
 $("backBtn").onclick=()=>{ renderHome(); showView("home"); };
 
@@ -86,10 +87,12 @@ function renderPicker(){
   const t=T.tool, v=$("toolView");
   v.innerHTML=`${toolHead()}<div class="tv-head"><h1>${t.name}</h1><div class="dvh">${t.dv}</div><p>${t.desc}</p></div>
    <div class="picker" id="picker"><button class="btn primary" id="pick">${svgI(t.images?"jpg2pdf":"pdf2jpg").replace('stroke="currentColor"','stroke="#fff"')} Select ${t.images?"images":t.multi?"PDF files":"PDF file"}</button>
+   <button class="btn ghost" id="pickLib" style="margin-left:6px;font-size:16px;padding:12px 18px">From My Files</button>
    <small>or drop ${t.images?"images":"PDFs"} here</small></div>
    <input type="file" id="tvIn" hidden ${t.multi?"multiple":""} accept="${t.images?"image/*":"application/pdf,.pdf"}">`;
   bindBack();
   $("pick").onclick=()=>$("tvIn").click();
+  $("pickLib").onclick=async()=>{ const rs=await pickFromLibrary({images:!!t.images, multi:!!t.multi}); if(rs.length) addToolFiles(rs.map(recToFile)); };
   $("tvIn").onchange=e=>{ addToolFiles([...e.target.files]); e.target.value=""; };
   bindDrop($("picker"));
 }
@@ -439,14 +442,15 @@ function renderDone(){
   const r=T.result, isPdf=/\.pdf$/.test(r.name), v=$("toolView");
   v.innerHTML=`${toolHead()}<div class="done"><div class="ok">✓</div><h2>Your file is ready</h2>
    <p>${esc(r.name)} · ${(r.blob.size/1024/1024).toFixed(2)} MB</p>
-   <div class="btns"><button class="btn primary" id="dlAgain">Download again</button>
+   <div class="btns"><button class="btn primary" id="dlAgain">Download again</button><button class="btn ghost" id="toLib">Save to My Files</button>
    ${isPdf?`<button class="btn ghost" id="toEditor">Edit / fill this PDF</button>`:""}
    <button class="btn ghost" id="again">Back to ${esc(T.tool.name)}</button><button class="btn ghost" id="homeB">All tools</button></div></div>`;
   bindBack();
   $("dlAgain").onclick=()=>saveFile(r.blob,r.name);
+  $("toLib").onclick=async()=>{ const x=await askSaveTo(r.name, FV.folder||""); if(!x||!x.value) return; let nm=x.value; const ext=(r.name.match(/\.[^.]+$/)||[""])[0]; if(ext && !nm.toLowerCase().endsWith(ext)) nm+=ext;
+    try{ const rec=await saveBlobToLibrary(r.blob, nm, {folder:x.folder||null}); toast(`Saved “${rec.name}” to My Files`); }catch(e){ toast("Couldn't save: "+(e.message||e),5000); } };
   $("again").onclick=()=>{ T.result=null; renderWork(); };
   $("homeB").onclick=()=>{ renderHome(); showView("home"); };
   const te=$("toEditor"); if(te) te.onclick=async()=>{ showView("editor"); await openFile(new File([r.blob],r.name,{type:"application/pdf"}),true); };
 }
 
-renderHome(); showView("home");
