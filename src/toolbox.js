@@ -32,7 +32,7 @@ const BRAND='<div class="brand"><div class="logo">ލ</div><div>Liyun <small>ލި
 
 function showView(v){
   curView=v;
-  ["home","tool","editor","files"].forEach(n=>$(n+"View").classList.toggle("hidden",n!==v));
+  ["home","tool","editor","files","admin"].forEach(n=>$(n+"View").classList.toggle("hidden",n!==v));
   $("hint").classList.toggle("hidden", v!=="editor" || !S.pdf);
   if(v!=="editor") setOsk(false);
   window.scrollTo(0,0);
@@ -41,7 +41,7 @@ function showView(v){
 /* ---------------- home ---------------- */
 function renderHome(){
   const h=$("homeView");
-  h.innerHTML=`<nav class="topnav">${BRAND}<div class="sp"></div><span class="note hide-sm">Files never leave your device</span><button class="btn ghost" id="myFilesBtn">${FICON.folder.replace("<svg ","<svg width=\"20\" height=\"20\" ")} My Files</button></nav>
+  h.innerHTML=`<nav class="topnav">${BRAND}<div class="sp"></div><span class="note hide-sm">Files never leave your device</span><button class="btn ghost" id="myFilesBtn">${FICON.folder.replace("<svg ","<svg width=\"20\" height=\"20\" ")} My Files</button>${AUTH.me?`<button class="btn ghost" id="meBtn" title="Account"><span class="avatar">${esc((AUTH.me.name||AUTH.me.u).trim()[0]||"?").toUpperCase()}</span><span class="hide-sm">${esc(AUTH.me.name||AUTH.me.u)}</span></button>`:""}</nav>
   <section class="hero"><h1>Every PDF tool you need — in Dhivehi too</h1>
   <div class="dvh">ޕީޑީއެފް އާ ގުޅޭ ހުރިހާ ކަމެއް، ދިވެހިބަހުން</div>
   <p>Fill forms in Thaana, sign, merge, split, number and watermark PDFs. Everything runs right here in your browser.</p></section>
@@ -53,6 +53,11 @@ function renderHome(){
   h.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>openTool(b.dataset.t));
   const c=$("contBtn"); if(c) c.onclick=()=>showView("editor");
   $("myFilesBtn").onclick=()=>openFiles();
+  const me=$("meBtn"); if(me) me.onclick=()=>{ closeMenu(); const m=document.createElement("div"); m.className="fmenu"; m.id="fmenu";
+    m.innerHTML=`<div class="fm-h"><b dir="auto">${esc(AUTH.me.name||"")}</b><br><span class="muted">${esc(AUTH.me.u)} · ${AUTH.me.role==="admin"?"Admin":"User"}</span></div><hr>${isAdmin()?'<button data-a="admin">Admin — manage users</button>':""}<button data-a="out">Sign out</button>`;
+    document.body.append(m); const r=me.getBoundingClientRect(); m.style.left=Math.max(8,r.right-m.offsetWidth)+"px"; m.style.top=r.bottom+4+"px";
+    m.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>{ closeMenu(); b.dataset.a==="admin"?openAdmin():signOut(); });
+    setTimeout(()=>document.addEventListener("pointerdown",menuAway,true),0); };
 }
 $("backBtn").onclick=()=>{ renderHome(); showView("home"); };
 

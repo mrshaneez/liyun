@@ -124,3 +124,31 @@
 .dlg-l{display:block;font-size:12px;font-weight:600;color:var(--muted);margin:10px 0 4px}
 .btn.danger{background:var(--danger);color:#fff;padding:7px 14px}
 .muted{color:var(--muted);font-size:12px}
+
+/* ---------- sign-in & admin ---------- */
+body.locked .view, body.locked #hint, body.locked .osk{display:none!important}
+#gate{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:16px;background:linear-gradient(160deg,#e6f3f1,#eef1f4 60%)}
+.gate-card{background:#fff;border-radius:18px;box-shadow:0 20px 50px rgba(20,40,60,.12);padding:28px 24px;width:min(380px,100%);text-align:center}
+.gate-card h2{margin:10px 0 2px;font-size:22px}
+.gate-card .gm{color:var(--muted);margin:0 0 16px;font-size:14px}
+.gate-card form{display:flex;flex-direction:column;gap:10px;text-align:left}
+.gate-card input:not([type=checkbox]){border:1px solid var(--line);border-radius:10px;padding:11px 12px;font-size:15px;width:100%}
+.gate-card input:focus{outline:2px solid #b7dcd6;border-color:var(--accent)}
+.gm2{color:var(--muted);font-size:13px}
+.gerr{color:var(--danger);font-size:13px;min-height:18px}
+.avatar{width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;display:inline-grid;place-items:center;font-size:12px;font-weight:700}
+.fm-h{padding:6px 10px 4px;font-size:14px}
+.fv-row.ad{grid-template-columns:1.4fr 1fr 90px 90px 34px}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;color:#3b4652}
+.pill.adm{background:#efe8ff;color:#6b43d1}.pill.blk{background:#fdeceb;color:var(--danger)}.pill.ok{background:var(--accent-2);color:var(--accent)}
+.pub{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:#fff7e6;border:1px solid #f3d18a;border-radius:12px;padding:12px 14px;margin-bottom:14px}
+.pub>div{flex:1;min-width:200px;font-size:13px;color:#6b5320}
+.pub b{color:#4a3910}
+.ghset{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:16px}
+.ghset summary{cursor:pointer;font-weight:600}
+.ghgrid{display:grid;grid-template-columns:1fr 140px;gap:10px}
+.ghgrid label,.uform label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:#3b4652}
+.ghgrid input,.uform input:not([type=checkbox]){border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:14px;font-weight:400}
+.uform{display:flex;flex-direction:column;gap:10px}
+.uform .chk{flex-direction:row;font-size:14px;font-weight:400}
+@media (max-width:600px){.fv-row.ad{grid-template-columns:1fr 70px 34px}.fv-row.ad>span:nth-child(2),.fv-row.ad>span:nth-child(3){display:none}.ghgrid{grid-template-columns:1fr}}

@@ -318,3 +318,4 @@ async function pickFromLibrary({images=false, multi=false}={}){
 $("libSaveBtn").onclick=editorSave;
 $("openLib").onclick=async()=>{ const rs=await pickFromLibrary({}); if(rs[0]) openRecordInEditor(rs[0]); };
 renderHome(); showView("home");
+authStart();
